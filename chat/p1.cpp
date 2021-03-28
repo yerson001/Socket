@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <string.h>
 
 int main(void) {
 	struct sockaddr_in direccionServidor;
@@ -20,7 +21,7 @@ int main(void) {
 		return 1;
 	}
 
-	printf("Estoy escuchando\n");
+	printf("---------Server---------\n");
 	listen(servidor, 100);
 
 	//------------------------------
@@ -29,24 +30,25 @@ int main(void) {
 	unsigned int tamanoDireccion;
 	int cliente = accept(servidor,NULL,NULL);
 
-	printf("Recibí una conexión en %d!!\n", cliente);
-	send(cliente, "Hola NetCat!", 13, 0);
-	send(cliente, ":)\n", 4, 0);
-
-	//------------------------------
+	printf("Connect: %d!!\n", cliente);
 
 	char buffer[256];
 
 	while (1) {
 		int bytesRecibidos = recv(cliente, buffer, 1000, 0);
-		send(cliente,"xd\n",4,0);
+		
+		char mensaje[1000];
+    printf("YOU: ");
+		scanf("%s", mensaje);
+		send(cliente, mensaje, strlen(mensaje), 0);
+
 		if (bytesRecibidos <= 0) {
-			perror("El chabón se desconectó o bla.");
+			perror("END CONNECTION.");
 			return 1;
 		}
 
 		buffer[bytesRecibidos] = '\0';
-		printf("cliente %d >>  %s\n", bytesRecibidos, buffer);
+		printf("CLIENT:[%d]  %s\n", bytesRecibidos, buffer);
 	}
 
 	free(buffer);

@@ -25,7 +25,7 @@
     //memset(&stSockAddr, 0, sizeof(struct sockaddr_in));
  
     stSockAddr.sin_family = AF_INET;
-    stSockAddr.sin_port = htons(45000);
+    stSockAddr.sin_port = htons(8080);
     Res = inet_pton(AF_INET, "127.0.0.1", &stSockAddr.sin_addr);
  
     if (0 > Res)
@@ -47,8 +47,12 @@
       close(SocketFD);
       exit(EXIT_FAILURE);
     }
+
     n = write(SocketFD,"Hi, this is yrsn.",18);
     /* perform read write operations ... */
+    
+    
+    
      char buffer[256];
      n = read(SocketFD,buffer,100);
      printf("%s\n",buffer);
