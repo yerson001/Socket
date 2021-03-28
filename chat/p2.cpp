@@ -48,7 +48,7 @@
       exit(EXIT_FAILURE);
     }
 
-//     n = write(SocketFD,"Hi, this is yrsn.",18);
+    n = write(SocketFD,"Client connect ...",18);
     while (1) {
           
      char buffer[256];
