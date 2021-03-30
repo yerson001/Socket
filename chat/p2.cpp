@@ -1,6 +1,5 @@
- /* Client code in C */
- 
   #include <sys/types.h>
+  #include <iostream>
   #include <sys/socket.h>
   #include <netinet/in.h>
   #include <arpa/inet.h>
@@ -8,26 +7,34 @@
   #include <stdlib.h>
   #include <string.h>
   #include <unistd.h>
- 
+  
+  
+  using namespace std;
+
   int main(void)
   {
-    struct sockaddr_in stSockAddr;
+    struct sockaddr_in stSockAddr;  //define caracteristicas de comunicacion
     int Res;
-    int SocketFD = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int SocketFD = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP); //fd file descriptor, pf inet socket para internet
     int n;
- 
+    char buffer[1000];
+
     if (-1 == SocketFD)
     {
       perror("cannot create socket");
       exit(EXIT_FAILURE);
     }
- 
-    //memset(&stSockAddr, 0, sizeof(struct sockaddr_in));
- 
+    string txt;
+    
+    
+    
+    //memset(&stSockAddr, 0, sizeof(struct sockaddr_in));  //limpia stSockAddr
+
     stSockAddr.sin_family = AF_INET;
-    stSockAddr.sin_port = htons(8080);
-    Res = inet_pton(AF_INET, "127.0.0.1", &stSockAddr.sin_addr);
- 
+    stSockAddr.sin_port = htons(45000); //45001
+    Res = inet_pton(AF_INET, "127.0.0.1", &stSockAddr.sin_addr);  //identifica el puerto del servidor
+
+    //validdation of assining
     if (0 > Res)
     {
       perror("error: first parameter is not a valid address family");
@@ -40,30 +47,30 @@
       close(SocketFD);
       exit(EXIT_FAILURE);
     }
- 
+    //end of validation of assining
+
     if (-1 == connect(SocketFD, (const struct sockaddr *)&stSockAddr, sizeof(struct sockaddr_in)))
     {
       perror("connect failed");
       close(SocketFD);
       exit(EXIT_FAILURE);
     }
+    do{
+    cout<<"CLIENT: ";
+	cin >>txt;
+     n = write(SocketFD, txt.c_str(),txt.length());//"ximena",6);
+    /* perform read write operations ... */
 
-    n = write(SocketFD,"Client connect ...",18);
-    while (1) {
-          
-     char buffer[256];
-     n = read(SocketFD,buffer,100);
-     printf("SERVER: ");  
-     printf("%s\n",buffer);
-
-      char mensaje[1000];
-      printf("YOU: ");
-		  scanf("%s", mensaje);
-		  send(SocketFD, mensaje, strlen(mensaje), 0);
-	  }
+     n = read(SocketFD,buffer, 100);
+     printf("SERVER: [%s]\n",buffer);
+     //cout<<"server: "<< buffer << "\n";
+    
+     //Si el server escribe BYE, el chat del cliemte se cerrara
+     
+    }while (strncmp(buffer,"BYE",3) !=0);
 
     shutdown(SocketFD, SHUT_RDWR);
- 
+
     close(SocketFD);
     return 0;
   }

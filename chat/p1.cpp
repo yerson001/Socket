@@ -1,57 +1,90 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <string.h>
+  #include <iostream>
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <arpa/inet.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <unistd.h>
 
-int main(void) {
-	struct sockaddr_in direccionServidor;
-	direccionServidor.sin_family = AF_INET;
-	direccionServidor.sin_addr.s_addr = INADDR_ANY;
-	direccionServidor.sin_port = htons(8080);
+  using namespace std;
 
-	int servidor = socket(AF_INET, SOCK_STREAM, 0);
 
-	int activado = 1;
-	setsockopt(servidor, SOL_SOCKET, SO_REUSEADDR, &activado, sizeof(activado));
+  int main(void)
+  {
+    struct sockaddr_in stSockAddr;
+    int SocketFD = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    char buffer[256];
+    int n;
+    string txtserv;
+    
+    if(-1 == SocketFD)
+    {
+      perror("can not create socket");
+      exit(EXIT_FAILURE);
+    }
 
-	if (bind(servidor, (const struct sockaddr*) &direccionServidor, sizeof(struct sockaddr_in)) != 0) {
-		perror("Falló el bind");
-		return 1;
-	}
+    memset(&stSockAddr, 0, sizeof(struct sockaddr_in));
 
-	printf("---------Server---------\n");
-	listen(servidor, 100);
+    stSockAddr.sin_family = AF_INET;
+    stSockAddr.sin_port = htons(45000);
+    stSockAddr.sin_addr.s_addr = INADDR_ANY;
+    //para cerrar x comsola el puerto 8083  
+    /*
+     ps aux | grep 8083
+     */
+    
+    //debemos linkear(bind) el stSockAddr con el socket
+        
+    if(-1 == bind(SocketFD,(const struct sockaddr *)&stSockAddr, sizeof(struct sockaddr_in)))
+    {
+      perror("error bind failed");
+      close(SocketFD);
+      exit(EXIT_FAILURE);
+    }
 
-	//------------------------------
+    if(-1 == listen(SocketFD, 10))
+    {
+      perror("error listen failed");
+      close(SocketFD);
+      exit(EXIT_FAILURE);
+    }
 
-	struct sockaddr_in direccionCliente;
-	unsigned int tamanoDireccion;
-	int cliente = accept(servidor,NULL,NULL);
+    for(;;)
+    {
+        
+      int ClientFD = accept(SocketFD, NULL, NULL);
+    do{
+      if(0 > ClientFD )
+      {
+        perror("error accept failed");
+        close(SocketFD);
+        exit(EXIT_FAILURE);
+      }
 
-	printf("Connect: %d!!\n", cliente);
+    
+     bzero(buffer,256);   ///clean up the  buffer
+     n = read(ClientFD ,buffer,255);
 
-	char buffer[256];
+     /**
+       n = 0 // no hay nada por recibir
+     */
+    
+     if (n < 0) perror("ERROR reading from socket");
+     printf("CLIENT: [%s]\n",buffer);
+     cout<<"SERVER: ";
+     cin >>txtserv;
+     n = write(ClientFD,txtserv.c_str(), txtserv.length() );//"I got your message",18);
+     if (n < 0) perror("ERROR writing to socket");
+     }while(strncmp(buffer,"BYE",3)!=0);
+     /* perform read write operations ... */
 
-	while (1) {
-		int bytesRecibidos = recv(cliente, buffer, 1000, 0);
-		
-		char mensaje[1000];
-    printf("YOU: ");
-		scanf("%s", mensaje);
-		send(cliente, mensaje, strlen(mensaje), 0);
+      shutdown(ClientFD , SHUT_RDWR);
 
-		if (bytesRecibidos <= 0) {
-			perror("END CONNECTION.");
-			return 1;
-		}
+      close(ClientFD);
+    }
 
-		buffer[bytesRecibidos] = '\0';
-		printf("CLIENT:[%d]  %s\n", bytesRecibidos, buffer);
-	}
-
-	free(buffer);
-
-	return 0;
-}
+    close(SocketFD);
+    return 0;
+  }
