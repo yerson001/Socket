@@ -1,3 +1,4 @@
+// server
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -30,13 +31,9 @@ int main(void)
   stSockAddr.sin_family = AF_INET;
   stSockAddr.sin_port = htons(45000);
   stSockAddr.sin_addr.s_addr = INADDR_ANY;
-  //para cerrar x comsola el puerto 8083  
-  /*
-    ps aux | grep 8083
-    */
-    
-  //debemos linkear(bind) el stSockAddr con el socket
+  
   std::cout<<"-------Servidor-------"<<std::endl;      
+
   if(-1 == bind(SocketFD,(const struct sockaddr *)&stSockAddr, sizeof(struct sockaddr_in)))
   {
     perror("error bind failed");
@@ -63,21 +60,19 @@ int main(void)
       }
 
     
-    bzero(buffer,256);   ///clean up the  buffer
+    bzero(buffer,256);   
     n = read(ClientFD ,buffer,255);
 
-     /**
-       n = 0 // no hay nada por recibir
-     */
     
     if (n < 0) perror("ERROR reading from socket");
     printf("CLIENT: [%s]\n",buffer);
     cout<<"SERVER: ";
     cin >>txtserv;
-    n = write(ClientFD,txtserv.c_str(), txtserv.length() );//"I got your message",18);
+    std::cout<<"size: "<<txtserv.length()<<std::endl;
+    n = write(ClientFD,txtserv.c_str(),txtserv.length());
     if (n < 0) perror("ERROR writing to socket");
-    }while(strncmp(buffer,"BYE",3)!=0);
-     /* perform read write operations ... */
+    }while(strncmp(buffer,"bye",3)!=0);
+  
 
     shutdown(ClientFD , SHUT_RDWR);
 

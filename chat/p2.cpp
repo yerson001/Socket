@@ -14,9 +14,9 @@ using namespace std;
 
 int main(void)
 {
-  struct sockaddr_in stSockAddr;  //define caracteristicas de comunicacion
+  struct sockaddr_in stSockAddr;  
   int Res;
-  int SocketFD = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP); //fd file descriptor, pf inet socket para internet
+  int SocketFD = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP); 
   int n;
   char buffer[1000];
 
@@ -27,15 +27,12 @@ int main(void)
   }
   string txt;
     
-    
-    
-    //memset(&stSockAddr, 0, sizeof(struct sockaddr_in));  //limpia stSockAddr
 
   stSockAddr.sin_family = AF_INET;
   stSockAddr.sin_port = htons(45000); //45001
-  Res = inet_pton(AF_INET, "127.0.0.1", &stSockAddr.sin_addr);  //identifica el puerto del servidor
+  Res = inet_pton(AF_INET, "127.0.0.1", &stSockAddr.sin_addr);  
 
-    //validdation of assining
+ 
   if (0 > Res)
   {
     perror("error: first parameter is not a valid address family");
@@ -59,16 +56,11 @@ int main(void)
   do{
     cout<<"CLIENT: ";
     cin >>txt;
-     n = write(SocketFD, txt.c_str(),txt.length());//"ximena",6);
-    /* perform read write operations ... */
-
-     n = read(SocketFD,buffer, 100);
-     printf("SERVER: [%s]\n",buffer);
-     //cout<<"server: "<< buffer << "\n";
-    
-     //Si el server escribe BYE, el chat del cliemte se cerrara
-     
-    }while (strncmp(buffer,"BYE",3) !=0);
+    n = write(SocketFD, txt.c_str(),txt.length());
+    std::cout<<"size: "<<txt.length()<<std::endl;
+    n = read(SocketFD,buffer, 100);
+    printf("SERVER: [%s]\n",buffer);
+  }while (strncmp(buffer,"bye",3) !=0);
 
   shutdown(SocketFD, SHUT_RDWR);
 
