@@ -36,7 +36,7 @@
      */
     
     //debemos linkear(bind) el stSockAddr con el socket
-        
+    print("-------Servidor-------")      
     if(-1 == bind(SocketFD,(const struct sockaddr *)&stSockAddr, sizeof(struct sockaddr_in)))
     {
       perror("error bind failed");
