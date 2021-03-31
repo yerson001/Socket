@@ -29,10 +29,10 @@ int main(void)
   memset(&stSockAddr, 0, sizeof(struct sockaddr_in));
 
   stSockAddr.sin_family = AF_INET;
-  stSockAddr.sin_port = htons(45000);
+  stSockAddr.sin_port = htons(50001);
   stSockAddr.sin_addr.s_addr = INADDR_ANY;
   
-  std::cout<<"-------Servidor-------"<<std::endl;      
+  std::cout<<"-------Server-------"<<std::endl;      
 
   if(-1 == bind(SocketFD,(const struct sockaddr *)&stSockAddr, sizeof(struct sockaddr_in)))
   {
@@ -68,7 +68,7 @@ int main(void)
     printf("CLIENT: [%s]\n",buffer);
     cout<<"SERVER: ";
     cin >>txtserv;
-    std::cout<<"size: "<<txtserv.length()<<std::endl;
+//     std::cout<<"size: "<<txtserv.length()<<std::endl;
     n = write(ClientFD,txtserv.c_str(),txtserv.length());
     if (n < 0) perror("ERROR writing to socket");
     }while(strncmp(buffer,"bye",3)!=0);

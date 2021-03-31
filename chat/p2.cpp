@@ -29,8 +29,8 @@ int main(void)
     
 
   stSockAddr.sin_family = AF_INET;
-  stSockAddr.sin_port = htons(45000); //45001
-  Res = inet_pton(AF_INET, "127.0.0.1", &stSockAddr.sin_addr);  
+  stSockAddr.sin_port = htons(50001); //45001
+  Res = inet_pton(AF_INET, "190.232.168.71", &stSockAddr.sin_addr);  
 
  
   if (0 > Res)
@@ -57,7 +57,7 @@ int main(void)
     cout<<"CLIENT: ";
     cin >>txt;
     n = write(SocketFD, txt.c_str(),txt.length());
-    std::cout<<"size: "<<txt.length()<<std::endl;
+//     std::cout<<"size: "<<txt.length()<<std::endl;
     n = read(SocketFD,buffer, 100);
     printf("SERVER: [%s]\n",buffer);
   }while (strncmp(buffer,"bye",3) !=0);
